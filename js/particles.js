@@ -1,19 +1,19 @@
 /* ============================================================
    VenturePage — ambient dot-field engine
-   - One pool of dots, drawn behind the page content (never on top
-     of text). At page load they gather into the actual logo mark
-     (rasterized from assets/mark.png), large and centered in the
-     hero, with a small continuous jitter so nothing looks frozen.
-   - As you scroll, "shape-ness" toward whichever .icon-slot is
-     nearest an activation line is a continuous 0..1 value (smoothed
-     with smoothstep, recomputed every frame) rather than an on/off
-     flag, so gathering and dispersing is gradual, not a snap.
-   - Away from any icon, dots settle into a genuine 2D random
-     scatter (independent x/y per dot) that drifts slowly with
-     scroll — earlier versions derived x and y from the same
-     formula, which produced diagonal streak artifacts instead of
-     an even star field.
-   - Dots gently move out of the way of the mouse cursor.
+   - One small pool of dots — the same dots the whole time, nothing
+     extra idling in the background. At rest they drift as a loose,
+     slow scatter (warm cream, one rare red accent, sizes varied);
+     near an .icon-slot they gather into that shape, then let go
+     again as you keep scrolling. Background and icon are the same
+     dots, not two separate effects.
+   - Shape point-clouds are sampled on an even grid sized to roughly
+     match the particle count, not a random subset — with few dots
+     to work with, even coverage is what keeps a shape (especially
+     the logo) reading clearly instead of clumping in some areas
+     and leaving gaps in others.
+   - Motion is intentionally slow (small easing values) — everything
+     eases in over many frames rather than snapping.
+   - Drawn behind all page content (see #dot-canvas z-index in CSS).
    ============================================================ */
 
 (function () {
@@ -40,8 +40,8 @@
   }
   sizeCanvas();
 
-  var COLOR_A = [108, 99, 255];   // indigo
-  var COLOR_B = [34, 211, 238];   // cyan
+  var CREAM = [240, 230, 198];
+  var ACCENT = [194, 64, 47];
 
   function lerp(a, b, t) { return a + (b - a) * t; }
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
@@ -51,45 +51,38 @@
     return t * t * (3 - 2 * t);
   }
 
-  function mixColor(t) {
-    return 'rgb(' +
-      Math.round(lerp(COLOR_A[0], COLOR_B[0], t)) + ',' +
-      Math.round(lerp(COLOR_A[1], COLOR_B[1], t)) + ',' +
-      Math.round(lerp(COLOR_A[2], COLOR_B[2], t)) + ')';
-  }
-
   // ---------------------------------------------------------------
   // Shape point-clouds: hand-drawn icons (canvas primitives) plus the
   // real logo mark (rasterized from assets/mark.png once it loads).
-  // Icons that read as solid blobs when filled (dollar, chat) are
-  // drawn as thin strokes instead, same as the clock/check, so the
-  // sampled points fall along a legible outline with real gaps.
+  // Points are sampled on an even grid tuned to land close to a
+  // target count, so a small dot budget still covers the whole shape.
   // ---------------------------------------------------------------
-  function rasterizeCanvas(off, w, h, stride) {
+  function sampleEven(off, w, h, targetCount) {
     var octx = off.getContext('2d');
     var data = octx.getImageData(0, 0, w, h).data;
-    var pts = [];
-    for (var y = 0; y < h; y += stride) {
-      for (var x = 0; x < w; x += stride) {
-        var alpha = data[(y * w + x) * 4 + 3];
-        if (alpha > 120) pts.push([(x / w) - 0.5, (y / h) - 0.5]);
+    var full = [];
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        if (data[(y * w + x) * 4 + 3] > 120) full.push([x, y]);
       }
     }
-    for (var i = pts.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var tmp = pts[i]; pts[i] = pts[j]; pts[j] = tmp;
+    if (!full.length) return [];
+    var stride = Math.max(1, Math.round(Math.sqrt(full.length / targetCount)));
+    var pts = [];
+    for (var i = 0; i < full.length; i++) {
+      if (full[i][0] % stride === 0 && full[i][1] % stride === 0) pts.push(full[i]);
     }
-    return pts;
+    return pts.map(function (p) { return [(p[0] / w) - 0.5, (p[1] / h) - 0.5]; });
   }
 
-  function rasterizeDraw(drawFn, w, h, stride) {
+  function rasterizeDraw(drawFn, w, h, targetCount) {
     var off = document.createElement('canvas');
     off.width = w; off.height = h;
     var octx = off.getContext('2d');
     octx.fillStyle = '#fff';
     octx.strokeStyle = '#fff';
     drawFn(octx, w, h);
-    return rasterizeCanvas(off, w, h, stride);
+    return sampleEven(off, w, h, targetCount);
   }
 
   var ICON_SIZE = 140;
@@ -118,7 +111,7 @@
     },
     clock: function (c, s) {
       var cx = s / 2, cy = s / 2, r = s * 0.36;
-      c.lineWidth = s * 0.045;
+      c.lineWidth = s * 0.065;
       c.lineCap = 'round';
       c.beginPath();
       c.arc(cx, cy, r, 0, Math.PI * 2);
@@ -132,7 +125,7 @@
     },
     check: function (c, s) {
       var cx = s / 2, cy = s / 2, r = s * 0.38;
-      c.lineWidth = s * 0.05;
+      c.lineWidth = s * 0.07;
       c.lineCap = 'round';
       c.lineJoin = 'round';
       c.beginPath();
@@ -146,7 +139,7 @@
     },
     chat: function (c, s) {
       var w = s * 0.62, h = s * 0.42, x = (s - w) / 2, y = s * 0.26, rad = s * 0.09;
-      c.lineWidth = s * 0.045;
+      c.lineWidth = s * 0.065;
       c.lineJoin = 'round';
       c.beginPath();
       c.moveTo(x + rad, y);
@@ -174,36 +167,45 @@
       c.lineTo(cx - s * 0.26, s * 0.54);
       c.closePath();
       c.fill();
+    },
+    grid: function (c, s) {
+      var pad = s * 0.16, gap = s * 0.12, cell = (s - 2 * pad - gap) / 2;
+      c.lineWidth = s * 0.065;
+      for (var row = 0; row < 2; row++) {
+        for (var col = 0; col < 2; col++) {
+          c.strokeRect(pad + col * (cell + gap), pad + row * (cell + gap), cell, cell);
+        }
+      }
     }
   };
 
   var shapeCache = {};
-  function getShapePoints(name) {
+  function getShapePoints(name, targetCount) {
     if (name === 'logo') return shapeCache.logo || null;
     if (!ICON_DRAWERS[name]) return null;
-    if (!shapeCache[name]) shapeCache[name] = rasterizeDraw(ICON_DRAWERS[name], ICON_SIZE, ICON_SIZE, 3);
-    return shapeCache[name];
+    var key = name + ':' + targetCount;
+    if (!shapeCache[key]) shapeCache[key] = rasterizeDraw(ICON_DRAWERS[name], ICON_SIZE, ICON_SIZE, targetCount);
+    return shapeCache[key];
   }
+
+  // ---------------------------------------------------------------
+  // Particles — a single small pool, shared between "forming a
+  // shape" and "drifting as loose background dots."
+  // ---------------------------------------------------------------
+  var PARTICLE_COUNT = width < 700 ? 34 : (width < 1100 ? 46 : 58);
 
   (function loadLogoShape() {
     var img = new Image();
     img.onload = function () {
-      var w = 280;
+      var w = 260;
       var h = Math.max(1, Math.round(w * (img.naturalHeight / img.naturalWidth)));
       var off = document.createElement('canvas');
       off.width = w; off.height = h;
       off.getContext('2d').drawImage(img, 0, 0, w, h);
-      shapeCache.logo = rasterizeCanvas(off, w, h, 2);
+      shapeCache.logo = sampleEven(off, w, h, PARTICLE_COUNT);
     };
     img.src = 'assets/mark.png';
   })();
-
-  // ---------------------------------------------------------------
-  // Particles — one pool, shared between "forming a shape" and
-  // "drifting as stars." No separate always-on ambient crowd.
-  // ---------------------------------------------------------------
-  var PARTICLE_COUNT = width < 700 ? 65 : (width < 1100 ? 95 : 130);
-  var SHAPE_CAP = 90;
 
   var particles = [];
   (function initParticles() {
@@ -211,11 +213,11 @@
       particles.push({
         baseX: Math.random(),
         baseY: Math.random(),
-        freqX: 0.15 + Math.random() * 0.25,
-        freqY: 0.12 + Math.random() * 0.22,
+        freqX: 0.09 + Math.random() * 0.14,
+        freqY: 0.08 + Math.random() * 0.13,
         phase: Math.random() * Math.PI * 2,
-        colorT: Math.random(),
-        size: 1.6 + Math.random() * 2.6,
+        isAccent: Math.random() < 0.07,
+        size: 1.5 + Math.random() * 3.4,
         x: width * Math.random(),
         y: height * Math.random()
       });
@@ -242,7 +244,9 @@
   // Active-shape detection, recomputed every frame directly from
   // layout. "Shape-ness" toward each .icon-slot is a continuous
   // value (0..1, smoothstepped by distance from an activation line),
-  // not a hard on/off band, so forming and dispersing is gradual.
+  // held at full strength across most of a slot's visible range and
+  // only tapering at the edges, so forming/dispersing is gradual
+  // without dots dragging in from far away at odd in-between states.
   // ---------------------------------------------------------------
   var slots = Array.prototype.slice.call(document.querySelectorAll('.icon-slot'));
   var dominantName = null;
@@ -268,7 +272,7 @@
     var name = best ? best.getAttribute('data-icon') : null;
     if (name !== dominantName || (name && !dominantAssignment)) {
       dominantName = name;
-      var pts = name ? getShapePoints(name) : null;
+      var pts = name ? getShapePoints(name, PARTICLE_COUNT) : null;
       dominantAssignment = (pts && pts.length) ? pts : null;
     }
     dominantRect = bestRect;
@@ -288,11 +292,11 @@
     ctx.clearRect(0, 0, width, height);
 
     var driftPhase = scrollY / Math.max(height, 1);
-    var n = dominantAssignment ? Math.min(particles.length, dominantAssignment.length, SHAPE_CAP) : 0;
+    var n = dominantAssignment ? Math.min(particles.length, dominantAssignment.length) : 0;
     var rw = 0, rh = 0, rcx = 0, rcy = 0;
     if (n) {
-      rw = dominantRect.width * 0.85;
-      rh = dominantRect.height * 0.85;
+      rw = dominantRect.width * 0.88;
+      rh = dominantRect.height * 0.88;
       rcx = dominantRect.left + dominantRect.width / 2;
       rcy = dominantRect.top + dominantRect.height / 2;
     }
@@ -300,9 +304,9 @@
     for (var i = 0; i < particles.length; i++) {
       var p = particles[i];
 
-      var ambX = width * frac(p.baseX + driftPhase * 0.12);
-      var ambY = height * frac(p.baseY + driftPhase * 0.6);
-      var ambJitter = 20;
+      var ambX = width * frac(p.baseX + driftPhase * 0.1);
+      var ambY = height * frac(p.baseY + driftPhase * 0.55);
+      var ambJitter = 16;
 
       var targetX = ambX;
       var targetY = ambY;
@@ -317,7 +321,7 @@
         targetY = lerp(ambY, shapeY, shapeT);
       }
 
-      var jitterAmp = lerp(ambJitter, 3, shapeT);
+      var jitterAmp = lerp(ambJitter, 1.2, shapeT);
       var jx = Math.sin(t * p.freqX + p.phase) * jitterAmp;
       var jy = Math.cos(t * p.freqY + p.phase * 1.3) * jitterAmp;
       targetX += jx;
@@ -326,25 +330,26 @@
       if (mouseActive) {
         var dx = p.x - mouseX, dy = p.y - mouseY;
         var dist = Math.sqrt(dx * dx + dy * dy);
-        var repelRadius = 60;
+        var repelRadius = 50;
         if (dist < repelRadius && dist > 0.01) {
-          var force = (1 - dist / repelRadius) * lerp(1, 0.35, shapeT);
-          targetX += (dx / dist) * force * 22;
-          targetY += (dy / dist) * force * 22;
+          var force = (1 - dist / repelRadius) * lerp(1, 0.2, shapeT);
+          targetX += (dx / dist) * force * 15;
+          targetY += (dy / dist) * force * 15;
         }
       }
 
-      var ease = lerp(0.06, 0.14, shapeT);
+      var ease = lerp(0.022, 0.11, shapeT * shapeT);
       p.x += (targetX - p.x) * ease;
       p.y += (targetY - p.y) * ease;
 
-      var r = lerp(p.size, p.size * 1.25, shapeT);
-      var glowColor = mixColor(p.colorT);
+      var r = lerp(p.size, p.size * 1.15, shapeT);
+      var color = p.isAccent ? ACCENT : CREAM;
+      var glowColor = 'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')';
       ctx.beginPath();
       ctx.fillStyle = glowColor;
       ctx.shadowColor = glowColor;
-      ctx.shadowBlur = lerp(6, 4, shapeT);
-      ctx.globalAlpha = lerp(0.65, 0.95, shapeT);
+      ctx.shadowBlur = lerp(5, 3, shapeT);
+      ctx.globalAlpha = lerp(0.55, 0.9, shapeT);
       ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
       ctx.fill();
     }
