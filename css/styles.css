@@ -63,7 +63,7 @@ ul { padding-left: 0; list-style: none; margin: 0; }
 
 #dot-canvas {
   position: fixed; inset: 0; width: 100vw; height: 100vh;
-  pointer-events: none; z-index: 5; mix-blend-mode: screen;
+  pointer-events: none; z-index: 1; mix-blend-mode: screen;
 }
 
 /* ---------- layout helpers ---------- */
@@ -71,7 +71,7 @@ ul { padding-left: 0; list-style: none; margin: 0; }
   max-width: var(--max-width); margin: 0 auto; padding: 0 1.5rem;
 }
 .section { position: relative; padding: 6.5rem 0; z-index: 2; }
-.section-alt { background: var(--bg-alt); }
+.section-alt { background: none; }
 .center { text-align: center; margin-left: auto; margin-right: auto; }
 .section-lead { max-width: 640px; margin-left: auto; margin-right: auto; font-size: 1.05rem; }
 .eyebrow {
@@ -100,7 +100,7 @@ ul { padding-left: 0; list-style: none; margin: 0; }
   opacity: 0.4;
 }
 .hero-logo-slot {
-  width: 240px; height: 116px; border-radius: 14px; margin: 0 auto 1.5rem;
+  width: 270px; height: 130px; border-radius: 14px; margin: 0 auto 1.5rem;
 }
 
 /* ---------- header / nav ---------- */
