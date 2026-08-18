@@ -1,11 +1,16 @@
 /* ============================================================
    VenturePage — ambient dot-field engine
    - Fixed full-viewport canvas of glowing particles.
-   - At the top of the page they ring the logo; as you scroll they
-     break off (staggered) into an ambient flowing field.
-   - When a section's .icon-slot scrolls into view, nearby particles
-     morph into that section's icon (rasterized from canvas drawing,
-     not an external asset) and hold the shape while it's in view.
+   - At page load, dots gather into the actual logo mark shape,
+     large and centered in the hero — rasterized from assets/mark.png,
+     not a generic ring. They keep a small continuous jitter even
+     while "locked" into a shape, so nothing ever looks frozen.
+   - As you scroll, whichever .icon-slot is nearest the read-band
+     (checked fresh every frame, no IntersectionObserver lag) pulls
+     nearby dots into its icon's shape; everywhere else, dots disperse
+     into an ambient flow whose base position drifts with scrollY, so
+     the scatter actually changes as you move down the page instead of
+     sitting frozen in one viewport-relative pattern.
    ============================================================ */
 
 (function () {
@@ -37,6 +42,7 @@
 
   function lerp(a, b, t) { return a + (b - a) * t; }
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+  function frac(v) { return v - Math.floor(v); }
 
   function mixColor(t) {
     return 'rgb(' +
@@ -46,36 +52,38 @@
   }
 
   // ---------------------------------------------------------------
-  // Icon point-cloud generation (all hand-drawn, no external assets)
+  // Shape point-clouds: hand-drawn icons (canvas primitives) plus the
+  // real logo mark (rasterized from assets/mark.png once it loads).
   // ---------------------------------------------------------------
-  var ICON_SIZE = 140;
-
-  function rasterize(drawFn) {
-    var off = document.createElement('canvas');
-    off.width = ICON_SIZE;
-    off.height = ICON_SIZE;
+  function rasterizeCanvas(off, w, h) {
     var octx = off.getContext('2d');
-    octx.fillStyle = '#fff';
-    octx.strokeStyle = '#fff';
-    drawFn(octx, ICON_SIZE);
-    var data = octx.getImageData(0, 0, ICON_SIZE, ICON_SIZE).data;
+    var data = octx.getImageData(0, 0, w, h).data;
     var pts = [];
-    var stride = 5; // spacing between sampled points — wide enough to read as distinct dots, not a filled blob
-    for (var y = 0; y < ICON_SIZE; y += stride) {
-      for (var x = 0; x < ICON_SIZE; x += stride) {
-        var alpha = data[(y * ICON_SIZE + x) * 4 + 3];
-        if (alpha > 120) {
-          pts.push([(x / ICON_SIZE) - 0.5, (y / ICON_SIZE) - 0.5]);
-        }
+    var stride = 5;
+    for (var y = 0; y < h; y += stride) {
+      for (var x = 0; x < w; x += stride) {
+        var alpha = data[(y * w + x) * 4 + 3];
+        if (alpha > 120) pts.push([(x / w) - 0.5, (y / h) - 0.5]);
       }
     }
-    // shuffle for even distribution when later truncated
     for (var i = pts.length - 1; i > 0; i--) {
       var j = Math.floor(Math.random() * (i + 1));
       var tmp = pts[i]; pts[i] = pts[j]; pts[j] = tmp;
     }
     return pts;
   }
+
+  function rasterizeDraw(drawFn, w, h) {
+    var off = document.createElement('canvas');
+    off.width = w; off.height = h;
+    var octx = off.getContext('2d');
+    octx.fillStyle = '#fff';
+    octx.strokeStyle = '#fff';
+    drawFn(octx, w, h);
+    return rasterizeCanvas(off, w, h);
+  }
+
+  var ICON_SIZE = 140;
 
   var ICON_DRAWERS = {
     dollar: function (c, s) {
@@ -150,19 +158,32 @@
     }
   };
 
-  var iconPointCache = {};
-  function getIconPoints(name) {
-    if (!ICON_DRAWERS[name]) return [];
-    if (!iconPointCache[name]) {
-      iconPointCache[name] = rasterize(ICON_DRAWERS[name]);
-    }
-    return iconPointCache[name];
+  var shapeCache = {};
+  function getShapePoints(name) {
+    if (name === 'logo') return shapeCache.logo || null;
+    if (!ICON_DRAWERS[name]) return null;
+    if (!shapeCache[name]) shapeCache[name] = rasterizeDraw(ICON_DRAWERS[name], ICON_SIZE, ICON_SIZE);
+    return shapeCache[name];
   }
+
+  (function loadLogoShape() {
+    var img = new Image();
+    img.onload = function () {
+      var w = 200;
+      var h = Math.max(1, Math.round(w * (img.naturalHeight / img.naturalWidth)));
+      var off = document.createElement('canvas');
+      off.width = w; off.height = h;
+      off.getContext('2d').drawImage(img, 0, 0, w, h);
+      shapeCache.logo = rasterizeCanvas(off, w, h);
+    };
+    img.src = 'assets/mark.png';
+  })();
 
   // ---------------------------------------------------------------
   // Particles
   // ---------------------------------------------------------------
   var PARTICLE_COUNT = width < 700 ? 90 : (width < 1100 ? 140 : 190);
+  var SHAPE_CAP = Math.min(90, Math.round(PARTICLE_COUNT * 0.65));
 
   var particles = [];
   (function initParticles() {
@@ -170,23 +191,20 @@
       var seed = i / PARTICLE_COUNT;
       particles.push({
         seed: seed,
-        angle: Math.random() * Math.PI * 2,
-        radius: 40 + Math.random() * 60,
         freqX: 0.15 + Math.random() * 0.25,
         freqY: 0.12 + Math.random() * 0.22,
         phase: Math.random() * Math.PI * 2,
         colorT: Math.random(),
         size: 1.6 + Math.random() * 2.6,
-        x: width / 2,
-        y: height / 2,
-        breakThreshold: 0.05 + seed * 0.55 + Math.random() * 0.1
+        x: width * Math.random(),
+        y: height * Math.random()
       });
     }
   })();
 
   var scrollY = window.scrollY || 0;
   var lastScrollY = scrollY;
-  var scrollKick = 0; // brief extra jitter energy from scroll deltas
+  var scrollKick = 0;
 
   window.addEventListener('scroll', function () {
     scrollY = window.scrollY || 0;
@@ -198,56 +216,45 @@
   });
 
   // ---------------------------------------------------------------
-  // Icon-slot intersection tracking
+  // Active-shape detection, recomputed every frame directly from
+  // layout — whichever .icon-slot sits nearest the "read band" (upper-
+  // middle of the viewport) wins; none if nothing qualifies. This is
+  // deterministic and frame-accurate, unlike IntersectionObserver's
+  // threshold-crossing callbacks, which could fire late or on the
+  // wrong element when scrolling fast.
   // ---------------------------------------------------------------
-  var activeIconEl = null;
-  var activeIconName = null;
-  var iconAssignCache = null; // points assigned to first N particles for the active icon
+  var slots = Array.prototype.slice.call(document.querySelectorAll('.icon-slot'));
+  var activeName = null;
+  var activeRect = null;
+  var activeAssignment = null;
 
-  function refreshIconAssignment() {
-    if (!activeIconName) { iconAssignCache = null; return; }
-    var pts = getIconPoints(activeIconName);
-    if (!pts.length) { iconAssignCache = null; return; }
-    var n = Math.min(particles.length, pts.length, 90);
-    var chosen = [];
-    for (var i = 0; i < n; i++) chosen.push(pts[i]);
-    iconAssignCache = chosen;
-  }
-
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function (entries) {
-      var best = null, bestRatio = 0;
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting && entry.intersectionRatio > bestRatio) {
-          best = entry.target;
-          bestRatio = entry.intersectionRatio;
-        }
-      });
-      if (best) {
-        if (best !== activeIconEl) {
-          activeIconEl = best;
-          activeIconName = best.getAttribute('data-icon');
-          refreshIconAssignment();
-        }
-      } else {
-        // nothing from this batch intersecting enough; check if the
-        // currently active one dropped out entirely
-        var stillVisible = false;
-        document.querySelectorAll('.icon-slot').forEach(function (el) {
-          if (el === activeIconEl) {
-            var r = el.getBoundingClientRect();
-            if (r.top < height && r.bottom > 0) stillVisible = true;
-          }
-        });
-        if (!stillVisible) {
-          activeIconEl = null;
-          activeIconName = null;
-          iconAssignCache = null;
-        }
+  function updateActiveShape() {
+    var bandCenter = height * 0.38;
+    var bandHalf = height * 0.38;
+    var best = null, bestDist = Infinity;
+    for (var i = 0; i < slots.length; i++) {
+      var rect = slots[i].getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > height) continue;
+      var c = rect.top + rect.height / 2;
+      var dist = Math.abs(c - bandCenter);
+      if (dist < bandHalf && dist < bestDist) {
+        best = slots[i];
+        bestDist = dist;
       }
-    }, { threshold: [0.35, 0.5, 0.65] });
+    }
+    var name = best ? best.getAttribute('data-icon') : null;
 
-    document.querySelectorAll('.icon-slot').forEach(function (el) { io.observe(el); });
+    if (name !== activeName || (name && !activeAssignment)) {
+      activeName = name;
+      var pts = name ? getShapePoints(name) : null;
+      if (pts && pts.length) {
+        var n = Math.min(particles.length, pts.length, SHAPE_CAP);
+        activeAssignment = pts.slice(0, n);
+      } else {
+        activeAssignment = null;
+      }
+    }
+    if (best) activeRect = best.getBoundingClientRect();
   }
 
   // ---------------------------------------------------------------
@@ -261,61 +268,51 @@
     lastScrollY = scrollY;
     scrollKick = clamp(scrollKick * 0.9 + Math.abs(dScroll) * 0.5, 0, 40);
 
+    updateActiveShape();
+
     ctx.clearRect(0, 0, width, height);
 
-    var logoEl = document.querySelector('[data-nav-home]');
-    var logoRect = logoEl ? logoEl.getBoundingClientRect() : null;
-    var heroT = clamp(scrollY / Math.max(height * 0.8, 1), 0, 1);
-
-    var iconRect = activeIconEl ? activeIconEl.getBoundingClientRect() : null;
-    var iconScale = iconRect ? Math.max(Math.min(iconRect.width, iconRect.height, 220), 60) : 0;
-    var iconCx = iconRect ? iconRect.left + iconRect.width / 2 : 0;
-    var iconCy = iconRect ? iconRect.top + iconRect.height / 2 : 0;
+    var driftPhase = scrollY / Math.max(height, 1);
+    var assignedCount = activeAssignment ? activeAssignment.length : 0;
+    var rw = 0, rh = 0, rcx = 0, rcy = 0;
+    if (assignedCount) {
+      rw = activeRect.width * 0.85;
+      rh = activeRect.height * 0.85;
+      rcx = activeRect.left + activeRect.width / 2;
+      rcy = activeRect.top + activeRect.height / 2;
+    }
 
     for (var i = 0; i < particles.length; i++) {
       var p = particles[i];
+      var inShape = i < assignedCount;
 
-      // ambient flow target (viewport space, animates with time + scroll kick)
-      var ax = width * (0.15 + 0.7 * ((p.seed * 2.3) % 1));
-      var ay = height * (0.12 + 0.76 * ((p.seed * 3.7 + 0.15) % 1));
-      var wobbleX = Math.sin(t * p.freqX + p.phase) * (26 + scrollKick * 0.6);
-      var wobbleY = Math.cos(t * p.freqY + p.phase * 1.3) * (26 + scrollKick * 0.6);
-      var flowX = ax + wobbleX;
-      var flowY = ay + wobbleY;
+      var targetX, targetY, jitterAmp;
 
-      // hero ring target (around logo)
-      var ringX = flowX, ringY = flowY;
-      if (logoRect) {
-        var rcx = logoRect.left + logoRect.width / 2;
-        var rcy = logoRect.top + logoRect.height / 2;
-        ringX = rcx + Math.cos(p.angle + t * 0.4) * (logoRect.width * 0.7 + p.radius);
-        ringY = rcy + Math.sin(p.angle + t * 0.4) * (logoRect.height * 1.8 + p.radius * 0.6);
+      if (inShape) {
+        var pt = activeAssignment[i];
+        targetX = rcx + pt[0] * rw;
+        targetY = rcy + pt[1] * rh;
+        jitterAmp = 3.5;
+      } else {
+        targetX = width * (0.1 + 0.78 * frac(p.seed * 2.3 + driftPhase * 0.55));
+        targetY = height * (0.08 + 0.82 * frac(p.seed * 3.7 + driftPhase * 0.8 + 0.15));
+        jitterAmp = 22 + scrollKick * 0.6;
       }
 
-      var pT = clamp((heroT - 0) / Math.max(p.breakThreshold, 0.01), 0, 1);
-      pT = pT * pT * (3 - 2 * pT); // smoothstep
-      var targetX = lerp(ringX, flowX, pT);
-      var targetY = lerp(ringY, flowY, pT);
+      var jx = Math.sin(t * p.freqX + p.phase) * jitterAmp;
+      var jy = Math.cos(t * p.freqY + p.phase * 1.3) * jitterAmp;
 
-      // icon morph overrides target for the first N assigned particles
-      var inIconSet = iconAssignCache && i < iconAssignCache.length;
-      if (inIconSet) {
-        var pt = iconAssignCache[i];
-        targetX = iconCx + pt[0] * iconScale;
-        targetY = iconCy + pt[1] * iconScale;
-      }
+      var ease = inShape ? 0.13 : 0.07;
+      p.x += (targetX + jx - p.x) * ease;
+      p.y += (targetY + jy - p.y) * ease;
 
-      var ease = inIconSet ? 0.14 : 0.06;
-      p.x += (targetX - p.x) * ease;
-      p.y += (targetY - p.y) * ease;
-
-      var r = inIconSet ? p.size * 1.25 : p.size;
+      var r = inShape ? p.size * 1.25 : p.size;
       var glowColor = mixColor(p.colorT);
       ctx.beginPath();
       ctx.fillStyle = glowColor;
       ctx.shadowColor = glowColor;
-      ctx.shadowBlur = inIconSet ? 4 : 6;
-      ctx.globalAlpha = inIconSet ? 0.95 : 0.75;
+      ctx.shadowBlur = inShape ? 4 : 6;
+      ctx.globalAlpha = inShape ? 0.95 : 0.75;
       ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
       ctx.fill();
     }
@@ -325,10 +322,5 @@
     if (!reduceMotion) requestAnimationFrame(frame);
   }
 
-  if (reduceMotion) {
-    // draw a single calm static frame, no animation loop
-    requestAnimationFrame(frame);
-  } else {
-    requestAnimationFrame(frame);
-  }
+  requestAnimationFrame(frame);
 })();
