@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VenturePage — Websites Built to Work</title>
+<meta name="description" content="VenturePage designs and builds fast, modern websites for small and growing businesses — fixed pricing, direct access, no agency bloat.">
+<meta name="theme-color" content="#0b0d12">
+
+<meta property="og:title" content="VenturePage — Websites Built to Work">
+<meta property="og:description" content="Fast, modern websites for small and growing businesses. Fixed pricing, direct access, no agency bloat.">
+<meta property="og:type" content="website">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%2322D3EE%22>V</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<canvas id="dot-canvas" aria-hidden="true"></canvas>
+
+<header class="site-header" id="top">
+  <div class="header-inner">
+    <a class="brand" href="#top" data-nav-home aria-label="VenturePage home">
+      <img id="brand-logo-img" src="assets/mark.png" alt="" class="brand-logo-img">
+      <span id="brand-wordmark" class="brand-wordmark">Venture<em>Page</em></span>
+    </a>
+
+    <nav class="main-nav" id="main-nav" aria-label="Primary">
+      <ul>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#process">Process</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#contact" class="nav-cta">Contact</a></li>
+      </ul>
+    </nav>
+
+    <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="main-nav" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-inner">
+      <p class="eyebrow">Web design &amp; development studio</p>
+      <h1>We build websites that <span class="highlight">pull their weight.</span></h1>
+      <p class="hero-sub">VenturePage designs and builds fast, modern websites for small and growing
+        businesses — without agency bloat, agency committees, or agency prices.</p>
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-primary">Start a project</a>
+        <a href="#pricing" class="btn btn-ghost">See pricing</a>
+      </div>
+      <ul class="hero-trust">
+        <li>Fixed, transparent pricing</li>
+        <li>Direct access to who builds it</li>
+        <li>Live on the edge with Cloudflare</li>
+      </ul>
+    </div>
+    <div class="scroll-cue" aria-hidden="true"><span></span>Scroll</div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="section" id="services">
+    <div class="section-inner">
+      <div class="icon-slot" data-icon="code" aria-hidden="true"></div>
+      <p class="eyebrow center">What we do</p>
+      <h2 class="center">Every project starts with the same question: what does this site need to <em>do</em> for you?</h2>
+      <p class="section-lead center">From a first storefront to a full product build, we scope for outcomes —
+        leads, sales, bookings, credibility — not just page counts.</p>
+
+      <div class="grid grid-4">
+        <article class="card">
+          <h3>Custom Websites</h3>
+          <p>Hand-built marketing and business sites — fast, mobile-first, and easy for you to update.</p>
+        </article>
+        <article class="card">
+          <h3>Online Stores</h3>
+          <p>E-commerce builds with product catalogs, payments, and checkout flows that don't get in the way of a sale.</p>
+        </article>
+        <article class="card">
+          <h3>Web Apps &amp; Integrations</h3>
+          <p>Booking systems, client portals, and third-party integrations — the parts that make a site actually run your business.</p>
+        </article>
+        <article class="card">
+          <h3>Care &amp; Support Plans</h3>
+          <p>Ongoing updates, monitoring, and small changes handled — so the site stays fast, secure, and current.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="section section-alt" id="process">
+    <div class="section-inner">
+      <div class="icon-slot" data-icon="clock" aria-hidden="true"></div>
+      <p class="eyebrow center">How it works</p>
+      <h2 class="center">Five steps. No mystery in between.</h2>
+      <p class="section-lead center">You'll always know what's happening and when — most projects follow this exact path.</p>
+
+      <ol class="process-list">
+        <li>
+          <span class="step-num">01</span>
+          <div>
+            <h3>Discover <small>1–2 days</small></h3>
+            <p>A short call and questionnaire to nail down your goals, audience, and must-haves.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">02</span>
+          <div>
+            <h3>Design <small>3–5 days</small></h3>
+            <p>Visual direction and key page layouts, shared for feedback before a single line of code is built out.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">03</span>
+          <div>
+            <h3>Build <small>1–8 weeks, by scope</small></h3>
+            <p>The site gets built — responsive, fast, and tested across devices as we go.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">04</span>
+          <div>
+            <h3>Launch <small>1–2 days</small></h3>
+            <p>Final QA, content check, and a clean cutover to production — with zero-downtime deploys.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">05</span>
+          <div>
+            <h3>Support <small>ongoing</small></h3>
+            <p>A Care Plan (or ad hoc requests) keeps things running long after launch day.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="section" id="pricing">
+    <div class="section-inner">
+      <div class="icon-slot" data-icon="dollar" aria-hidden="true"></div>
+      <p class="eyebrow center">Pricing</p>
+      <h2 class="center">Straightforward pricing, at least 15% below typical market rates.</h2>
+      <p class="section-lead center">We benchmarked our pricing against 2026 industry research on freelance and
+        boutique web-design pricing<sup><a href="#pricing-note">*</a></sup> — then priced every tier at least
+        15% under the typical starting point for the same scope.</p>
+
+      <div class="grid grid-4 pricing-grid">
+        <article class="card price-card">
+          <h3>Launch</h3>
+          <p class="price">From $2,550</p>
+          <p class="price-compare">Typical market start: <span>~$3,000</span></p>
+          <p class="price-desc">A polished, professional site to establish credibility online.</p>
+          <ul>
+            <li>Up to 5 pages</li>
+            <li>Mobile-first responsive design</li>
+            <li>Contact form &amp; basic on-page SEO</li>
+            <li>1 round of revisions</li>
+            <li>2–3 week turnaround</li>
+          </ul>
+        </article>
+
+        <article class="card price-card featured">
+          <p class="price-badge">Most popular</p>
+          <h3>Growth</h3>
+          <p class="price">From $6,800</p>
+          <p class="price-compare">Typical market start: <span>~$8,000</span></p>
+          <p class="price-desc">For growing businesses that need more room to convert visitors into customers.</p>
+          <ul>
+            <li>Up to 12 pages, blog/CMS</li>
+            <li>Advanced SEO setup</li>
+            <li>Newsletter &amp; booking integrations</li>
+            <li>2 rounds of revisions</li>
+            <li>4–6 week turnaround</li>
+          </ul>
+        </article>
+
+        <article class="card price-card">
+          <h3>Commerce</h3>
+          <p class="price">From $10,200</p>
+          <p class="price-compare">Typical market start: <span>~$12,000</span></p>
+          <p class="price-desc">A full online store or custom web app, built to handle real transactions.</p>
+          <ul>
+            <li>E-commerce or custom app build</li>
+            <li>Payment integration</li>
+            <li>Unlimited pages</li>
+            <li>3 rounds of revisions</li>
+            <li>6–10 week turnaround</li>
+          </ul>
+        </article>
+
+        <article class="card price-card">
+          <h3>Care Plan</h3>
+          <p class="price">From $255<span class="price-period">/mo</span></p>
+          <p class="price-compare">Typical market start: <span>~$300/mo</span></p>
+          <p class="price-desc">Ongoing updates, monitoring, and support after launch.</p>
+          <ul>
+            <li>Uptime &amp; security monitoring</li>
+            <li>Monthly content updates</li>
+            <li>Performance report</li>
+            <li>Priority email support</li>
+          </ul>
+        </article>
+      </div>
+
+      <p class="fine-print" id="pricing-note">*Comparison figures reflect publicly reported 2026 industry pricing
+        research for freelance and boutique web-design services in aggregate — not any single company. All prices
+        shown are starting points; final quotes depend on project scope and are confirmed after a free scoping call.</p>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section section-alt" id="about">
+    <div class="section-inner">
+      <div class="icon-slot" data-icon="check" aria-hidden="true"></div>
+      <p class="eyebrow center">About VenturePage</p>
+      <h2 class="center">Built for businesses tired of choosing between DIY and overpriced agencies.</h2>
+      <p class="section-lead center">VenturePage is a small, senior-led studio. You work directly with the person
+        building your site — no account managers, no six-person committee, no retainer you can't explain to your
+        accountant.</p>
+
+      <div class="grid grid-2 about-grid">
+        <div>
+          <h3>Who we work with</h3>
+          <p>Small and mid-sized businesses, local service providers, and startups who need a site that actually
+            performs — not just one that looks fine in a mockup. If you're choosing between a $20/month DIY builder
+            that limits you and a $40,000 agency retainer that overshoots you, we're built for the space in between.</p>
+        </div>
+        <div>
+          <h3>How we're different</h3>
+          <ul class="check-list">
+            <li>Direct access — you work with the person building your site, not a rotating account team.</li>
+            <li>Fixed, transparent pricing — no surprise invoices, no vague "it depends."</li>
+            <li>Built on modern, edge infrastructure — every site ships fast and stays up.</li>
+            <li>You own your code — your project lives in your own GitHub repository from day one.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq">
+    <div class="section-inner">
+      <div class="icon-slot" data-icon="chat" aria-hidden="true"></div>
+      <p class="eyebrow center">FAQ</p>
+      <h2 class="center">Questions we hear a lot</h2>
+
+      <div class="faq-list">
+        <details>
+          <summary>How long does a project take?</summary>
+          <p>Most Launch sites take 2–3 weeks, Growth sites 4–6 weeks, and Commerce/custom builds 6–10 weeks,
+            depending on scope and how quickly we get feedback and content from you.</p>
+        </details>
+        <details>
+          <summary>Do I own my website after it's built?</summary>
+          <p>Yes. The full source code lives in a GitHub repository under your account (or transferred to you at
+            launch), so you're never locked into us or a proprietary platform.</p>
+        </details>
+        <details>
+          <summary>What if I need changes after launch?</summary>
+          <p>A Care Plan covers ongoing updates and monitoring. For one-off changes, we're happy to quote hourly
+            or per-request instead.</p>
+        </details>
+        <details>
+          <summary>Do you write the content and copy too?</summary>
+          <p>We can work from copy you provide, help you refine it, or draft it for you as an add-on — let us
+            know what you need during the Discover step.</p>
+        </details>
+        <details>
+          <summary>What do you actually build sites with?</summary>
+          <p>Modern, hand-built code rather than bloated page-builder plugins, deployed on a global edge network
+            for speed, security, and uptime — not a slow shared server.</p>
+        </details>
+        <details>
+          <summary>Can you redesign my existing site instead of building new?</summary>
+          <p>Yes — redesigns and migrations fit into any tier above; we'll scope it the same way during Discover.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section section-alt" id="contact">
+    <div class="section-inner">
+      <div class="icon-slot" data-icon="arrow" aria-hidden="true"></div>
+      <p class="eyebrow center">Get in touch</p>
+      <h2 class="center">Let's build something that works.</h2>
+      <p class="section-lead center">Tell us a bit about your project and we'll get back to you within one
+        business day.</p>
+
+      <div class="contact-wrap">
+        <div class="contact-cards">
+          <a class="contact-card" href="mailto:sitesmithmail@gmail.com">
+            <span class="contact-label">Email</span>
+            <span class="contact-value">sitesmithmail@gmail.com</span>
+          </a>
+          <a class="contact-card" href="tel:+16464001514">
+            <span class="contact-label">Phone</span>
+            <span class="contact-value">(646) 400-1514</span>
+          </a>
+        </div>
+
+        <form class="contact-form" id="contact-form">
+          <div class="form-row">
+            <label for="cf-name">Name</label>
+            <input type="text" id="cf-name" name="name" required autocomplete="name">
+          </div>
+          <div class="form-row">
+            <label for="cf-email">Email</label>
+            <input type="email" id="cf-email" name="email" required autocomplete="email">
+          </div>
+          <div class="form-row">
+            <label for="cf-project">Tell us about your project</label>
+            <textarea id="cf-project" name="project" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Send message</button>
+          <p class="form-note">This opens your email client with the message pre-filled — nothing is stored on this site.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a class="brand" href="#top" data-nav-home>
+      <span class="brand-wordmark">Venture<em>Page</em></span>
+    </a>
+    <nav aria-label="Footer">
+      <a href="#services">Services</a>
+      <a href="#process">Process</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#about">About</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <p class="footer-meta">© 2026 VenturePage. All rights reserved. &nbsp;·&nbsp; Source on
+      <a href="https://github.com/" id="footer-github-link">GitHub</a> &nbsp;·&nbsp; Hosted on Cloudflare</p>
+  </div>
+</footer>
+
+<script src="js/particles.js" defer></script>
+<script src="js/main.js" defer></script>
+</body>
+</html>
