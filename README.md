@@ -1,5 +1,8 @@
 # VenturePage website
 
+**Live:** https://venturepage-website.pages.dev
+**Source:** https://github.com/Dungeonmac/venturepage-website (auto-deploys on every push to `main`)
+
 Static site — no build step, no framework, no dependencies. Just `index.html` + CSS + JS.
 That's intentional: it means it can be deployed to Cloudflare Pages by pointing at the repo
 root, with nothing to configure.
@@ -16,50 +19,52 @@ David/
     SiteSmithlogo.png ← your original upload, unedited
 ```
 
-## Getting this onto GitHub
+## GitHub + Cloudflare Pages — done
 
-This machine doesn't have Git installed, so pushing needs to happen either after installing
-Git, or via GitHub Desktop (no command line required):
+Both are set up and live:
 
-1. Install [GitHub Desktop](https://desktop.github.com/) (easiest, no CLI) **or** [Git for
-   Windows](https://git-scm.com/download/win) if you'd rather use the command line.
-2. Create a new repository on [github.com](https://github.com/new) — e.g. `venturepage-website`.
-   Public or private both work fine with Cloudflare Pages.
-3. Add this `David` folder's contents as the repo's root and push:
-   - **GitHub Desktop:** File → Add Local Repository → point it at this `David` folder →
-     Publish repository.
-   - **Command line** (after installing Git):
-     ```
-     cd path\to\David
-     git init
-     git add .
-     git commit -m "Initial site"
-     git branch -M main
-     git remote add origin https://github.com/<you>/venturepage-website.git
-     git push -u origin main
-     ```
+- Repo created at `github.com/Dungeonmac/venturepage-website` and the site files uploaded via
+  GitHub's web uploader (this machine still has no Git installed, so that was done through the
+  browser rather than `git push` — see below if you want the CLI workflow for future changes).
+- A Cloudflare Pages project is connected to that repo (`main` branch, framework preset None,
+  no build command, output directory `/`), so **every push to `main` auto-redeploys**.
+- Live at **venturepage-website.pages.dev**.
 
-## Deploying on Cloudflare Pages
+### Making future changes without Git installed
 
-1. Go to the Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** →
-   **Connect to Git**.
-2. Select the `venturepage-website` repo.
-3. Build settings:
-   - Framework preset: **None**
-   - Build command: *(leave blank)*
-   - Build output directory: `/` (repo root — or `David` if you pushed the whole
-     `ClaudeCode` folder instead of just `David`)
-4. Save and Deploy. Cloudflare will give you a `*.pages.dev` URL immediately; every push to
-   `main` auto-redeploys.
-5. Once you have a domain, add it under the Pages project's **Custom domains** tab —
-   Cloudflare handles DNS and SSL for you if the domain's nameservers point to Cloudflare.
+Easiest path: edit files locally, then re-upload through GitHub's web UI — go to the repo,
+open the folder you're changing, use **Add file → Upload files**, drop in the updated file(s),
+and commit directly to `main`. Cloudflare picks up the push automatically within a few seconds.
+
+### Or install Git for a normal workflow
+
+1. Install [GitHub Desktop](https://desktop.github.com/) (no CLI) **or** [Git for
+   Windows](https://git-scm.com/download/win).
+2. **GitHub Desktop:** File → Clone repository → `Dungeonmac/venturepage-website` → point it at
+   this `David` folder (or a fresh clone) → make changes → commit → push.
+3. **Command line** (after installing Git):
+   ```
+   cd path\to\David
+   git init
+   git remote add origin https://github.com/Dungeonmac/venturepage-website.git
+   git fetch origin
+   git reset --soft origin/main
+   git add .
+   git commit -m "Update"
+   git push origin main
+   ```
+
+### Custom domain
+
+Once you register one, add it under the Pages project's **Custom domains** tab in the
+Cloudflare dashboard — Cloudflare handles DNS and SSL automatically once the domain's
+nameservers point to Cloudflare.
 
 ## What's still placeholder / needs your input
 
-- **Domain for the site itself** — once you register one (check availability for
-  `venturepage.xyz`-type options — `venturepage.com` is worth checking directly, wasn't
-  confirmed available or taken during the naming search), point its nameservers at Cloudflare
-  and attach it in the Pages project settings.
+- **Domain for the site itself** — `venturepage.com` wasn't confirmed available or taken
+  during the naming search, worth checking directly before registering. See "Custom domain"
+  above for how to attach it once you have one.
 - **Contact form** — currently client-side only: submitting opens the visitor's email app
   with the message pre-filled. No backend, no data stored — matches the GitHub + Cloudflare
   only setup. If you'd rather have submissions land in your inbox without the visitor's mail
