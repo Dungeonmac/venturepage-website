@@ -155,18 +155,26 @@
       c.lineTo(x + w * 0.44, y + h - 1);
       c.stroke();
     },
-    arrow: function (c, s) {
-      var cx = s / 2;
+    phone: function (c, s) {
+      // A simple cell phone: rounded rectangle body, speaker slot, home button.
+      var w = s * 0.42, h = s * 0.74, x = (s - w) / 2, y = (s - h) / 2, rad = s * 0.09;
+      c.lineWidth = s * 0.055;
+      c.lineJoin = 'round';
       c.beginPath();
-      c.moveTo(cx, s * 0.84);
-      c.lineTo(cx + s * 0.26, s * 0.54);
-      c.lineTo(cx + s * 0.11, s * 0.54);
-      c.lineTo(cx + s * 0.11, s * 0.18);
-      c.lineTo(cx - s * 0.11, s * 0.18);
-      c.lineTo(cx - s * 0.11, s * 0.54);
-      c.lineTo(cx - s * 0.26, s * 0.54);
+      c.moveTo(x + rad, y);
+      c.arcTo(x + w, y, x + w, y + h, rad);
+      c.arcTo(x + w, y + h, x, y + h, rad);
+      c.arcTo(x, y + h, x, y, rad);
+      c.arcTo(x, y, x + w, y, rad);
       c.closePath();
-      c.fill();
+      c.stroke();
+      c.beginPath();
+      c.moveTo(s / 2 - w * 0.18, y + h * 0.1);
+      c.lineTo(s / 2 + w * 0.18, y + h * 0.1);
+      c.stroke();
+      c.beginPath();
+      c.arc(s / 2, y + h * 0.9, s * 0.032, 0, Math.PI * 2);
+      c.stroke();
     },
     grid: function (c, s) {
       var pad = s * 0.16, gap = s * 0.12, cell = (s - 2 * pad - gap) / 2;
@@ -239,6 +247,19 @@
     mouseX = e.clientX; mouseY = e.clientY; mouseActive = true;
   }, { passive: true });
   window.addEventListener('mouseleave', function () { mouseActive = false; });
+
+  // ---------------------------------------------------------------
+  // Hover-excite: elements marked .contact-cta make their icon's
+  // dots shake noticeably harder while the pointer is over them.
+  // ---------------------------------------------------------------
+  var excitedIcon = null;
+  Array.prototype.forEach.call(document.querySelectorAll('.contact-cta'), function (el) {
+    var slot = el.querySelector('.icon-slot');
+    var name = slot && slot.getAttribute('data-icon');
+    if (!name) return;
+    el.addEventListener('mouseenter', function () { excitedIcon = name; });
+    el.addEventListener('mouseleave', function () { if (excitedIcon === name) excitedIcon = null; });
+  });
 
   // ---------------------------------------------------------------
   // Active-shape detection, recomputed every frame directly from
@@ -321,20 +342,22 @@
         targetY = lerp(ambY, shapeY, shapeT);
       }
 
-      var jitterAmp = lerp(ambJitter, 1.2, shapeT);
-      var jx = Math.sin(t * p.freqX + p.phase) * jitterAmp;
-      var jy = Math.cos(t * p.freqY + p.phase * 1.3) * jitterAmp;
+      var excited = shapeT > 0.5 && dominantName && dominantName === excitedIcon;
+      var jitterAmp = lerp(ambJitter, excited ? 9 : 1.2, shapeT);
+      var jitterFreqMul = excited ? 5.5 : 1;
+      var jx = Math.sin(t * p.freqX * jitterFreqMul + p.phase) * jitterAmp;
+      var jy = Math.cos(t * p.freqY * jitterFreqMul + p.phase * 1.3) * jitterAmp;
       targetX += jx;
       targetY += jy;
 
       if (mouseActive) {
         var dx = p.x - mouseX, dy = p.y - mouseY;
         var dist = Math.sqrt(dx * dx + dy * dy);
-        var repelRadius = 50;
+        var repelRadius = 110;
         if (dist < repelRadius && dist > 0.01) {
           var force = (1 - dist / repelRadius) * lerp(1, 0.2, shapeT);
-          targetX += (dx / dist) * force * 15;
-          targetY += (dy / dist) * force * 15;
+          targetX += (dx / dist) * force * 34;
+          targetY += (dy / dist) * force * 34;
         }
       }
 

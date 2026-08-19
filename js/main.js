@@ -1,9 +1,22 @@
 /* ============================================================
-   VenturePage — page interactions (nav, contact form)
+   VenturePage — shared page interactions (mobile nav toggle).
+   Used on every page; contact.html has its own js/contact.js
+   for the multi-step form.
    ============================================================ */
 
 (function () {
   'use strict';
+
+  // ---- logo always scrolls back to top -----------------------------------
+  Array.prototype.forEach.call(document.querySelectorAll('[data-nav-home]'), function (link) {
+    var href = link.getAttribute('href') || '';
+    if (href.charAt(0) === '#') {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+  });
 
   // ---- mobile nav toggle -------------------------------------------------
   var toggle = document.getElementById('nav-toggle');
@@ -18,25 +31,6 @@
         nav.classList.remove('open');
         toggle.setAttribute('aria-expanded', 'false');
       });
-    });
-  }
-
-  // ---- contact form (client-side only, opens mail client) ----------------
-  var form = document.getElementById('contact-form');
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var name = form.name.value.trim();
-      var email = form.email.value.trim();
-      var project = form.project.value.trim();
-
-      var subject = encodeURIComponent('New project inquiry from ' + (name || 'website visitor'));
-      var body = encodeURIComponent(
-        'Name: ' + name + '\n' +
-        'Email: ' + email + '\n\n' +
-        project
-      );
-      window.location.href = 'mailto:sitesmithmail@gmail.com?subject=' + subject + '&body=' + body;
     });
   }
 })();
