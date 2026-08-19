@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — VenturePage</title>
+<meta name="description" content="Tell VenturePage about your project — a few quick steps and we'll get back to you within one business day.">
+<meta name="theme-color" content="#0a0a0b">
+<meta name="robots" content="noindex">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23c2402f%22>V</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<canvas id="dot-canvas" aria-hidden="true"></canvas>
+
+<header class="site-header" id="top">
+  <div class="header-inner">
+    <a class="brand" href="index.html" aria-label="VenturePage home">
+      <img id="brand-logo-img" src="assets/mark.png" alt="" class="brand-logo-img">
+      <span id="brand-wordmark" class="brand-wordmark">Venture<em>Page</em></span>
+    </a>
+
+    <nav class="main-nav" id="main-nav" aria-label="Primary">
+      <ul>
+        <li><a href="index.html#services">Services</a></li>
+        <li><a href="index.html#process">Process</a></li>
+        <li><a href="index.html#work">Work</a></li>
+        <li><a href="index.html#pricing">Pricing</a></li>
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#faq">FAQ</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="main-nav" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="main" class="contact-main">
+
+  <section class="contact-hero">
+    <div class="section-inner">
+      <p class="eyebrow center">Get in touch</p>
+      <h2 class="center">Let's build something that works.</h2>
+      <p class="section-lead center">Tell us a bit about your project and we'll get back to you within one
+        business day.</p>
+    </div>
+  </section>
+
+  <section class="cube-wrap">
+    <div class="cube-scene" id="cube-scene">
+      <div class="cube" id="contact-cube">
+
+        <div class="cube-face cube-face--0" data-side="0">
+          <div class="cube-face-fields">
+            <h3>Let us know who you are</h3>
+            <div class="form-row">
+              <label for="cf-name">Name <span class="form-note" style="display:inline;margin:0;">(optional)</span></label>
+              <input type="text" id="cf-name" name="name" autocomplete="name">
+            </div>
+            <div class="form-row">
+              <label for="cf-email">Email</label>
+              <input type="email" id="cf-email" name="email" autocomplete="email" required>
+            </div>
+            <div class="form-row">
+              <label for="cf-phone">Phone</label>
+              <input type="tel" id="cf-phone" name="phone" autocomplete="tel" required>
+            </div>
+          </div>
+          <div class="cube-nav">
+            <span class="btn btn-ghost cube-back">Back</span>
+            <span class="cube-progress">1 / 4</span>
+            <span class="btn btn-primary cube-next" data-next>Next</span>
+          </div>
+        </div>
+
+        <div class="cube-face cube-face--1" data-side="1">
+          <div class="cube-face-fields">
+            <h3>Let us know what you do and how we can help</h3>
+            <div class="form-row">
+              <span class="form-row-label">I need a—</span>
+              <div class="cf-select" id="cf-need-select" data-name="need">
+                <button type="button" class="cf-select-trigger" data-placeholder="Select one…"></button>
+                <div class="cf-select-list" role="listbox">
+                  <div class="cf-select-option" role="option" data-value="Full website build">Full website build</div>
+                  <div class="cf-select-option" role="option" data-value="Website refresh">Website refresh</div>
+                  <div class="cf-select-option" role="option" data-value="Care plan">Care plan</div>
+                  <div class="cf-select-option" role="option" data-value="Other">Other</div>
+                </div>
+              </div>
+            </div>
+            <div class="form-row other-row" id="cf-need-other-row">
+              <label for="cf-need-other">Tell us what you need</label>
+              <input type="text" id="cf-need-other" name="needOther">
+            </div>
+            <div class="form-row">
+              <span class="form-row-label">I need a website for a—</span>
+              <div class="cf-select" id="cf-biztype-select" data-name="bizType">
+                <button type="button" class="cf-select-trigger" data-placeholder="Select one…"></button>
+                <div class="cf-select-list" role="listbox">
+                  <div class="cf-select-option" role="option" data-value="Firm">Firm</div>
+                  <div class="cf-select-option" role="option" data-value="Restaurant">Restaurant</div>
+                  <div class="cf-select-option" role="option" data-value="Store">Store</div>
+                  <div class="cf-select-option" role="option" data-value="E-commerce">E-commerce</div>
+                  <div class="cf-select-option" role="option" data-value="Other">Other</div>
+                </div>
+              </div>
+            </div>
+            <div class="form-row other-row" id="cf-biztype-other-row">
+              <label for="cf-biztype-other">Tell us what kind</label>
+              <input type="text" id="cf-biztype-other" name="bizTypeOther">
+            </div>
+          </div>
+          <div class="cube-nav">
+            <span class="btn btn-ghost cube-back is-visible">Back</span>
+            <span class="cube-progress">2 / 4</span>
+            <span class="btn btn-primary cube-next" data-next>Next</span>
+          </div>
+        </div>
+
+        <div class="cube-face cube-face--2" data-side="2">
+          <div class="cube-face-fields">
+            <h3>Tell us about your project</h3>
+            <div class="form-row cf-project-row">
+              <textarea id="cf-project" name="project" rows="9" placeholder="What are you trying to build?"></textarea>
+            </div>
+          </div>
+          <div class="cube-nav">
+            <span class="btn btn-ghost cube-back is-visible">Back</span>
+            <span class="cube-progress">3 / 4</span>
+            <span class="btn btn-primary cube-next" data-next>Next</span>
+          </div>
+        </div>
+
+        <div class="cube-face cube-face--3" data-side="3">
+          <div class="cube-face-fields cube-face-fields--send">
+            <button type="button" class="btn btn-primary cube-send" id="cf-send">Send message</button>
+          </div>
+          <div class="cube-nav">
+            <span class="btn btn-ghost cube-back is-visible">Back</span>
+            <span class="cube-progress">4 / 4</span>
+            <span></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <p class="contact-page-note" id="contact-page-note">Sending opens your email client with everything you've entered pre-filled — nothing
+    is stored on this site.</p>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-wordmark">Venture<em>Page</em></span>
+    </a>
+    <nav aria-label="Footer">
+      <a href="index.html#services">Services</a>
+      <a href="index.html#process">Process</a>
+      <a href="index.html#work">Work</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+    <p class="footer-meta">© 2026 VenturePage. All rights reserved. &nbsp;·&nbsp; Source on
+      <a href="https://github.com/" id="footer-github-link">GitHub</a> &nbsp;·&nbsp; Hosted on Cloudflare</p>
+  </div>
+</footer>
+
+<script src="js/particles.js" defer></script>
+<script src="js/main.js" defer></script>
+<script src="js/contact.js" defer></script>
+</body>
+</html>
