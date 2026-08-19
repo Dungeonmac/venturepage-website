@@ -71,7 +71,7 @@ nameservers point to Cloudflare.
   client popping up, that needs a small Cloudflare Pages Function plus an email-sending
   service (e.g. Resend) — happy to build that next if you want it.
 - **Pricing numbers** — grounded in 2026 industry research on freelance/boutique web design
-  pricing (see the footnote on the pricing section), each tier priced ~15% under the typical
+  pricing (see the footnote on the pricing section), each tier priced ~35% under the typical
   market starting point for that scope. Adjust freely once you know your real costs/margins.
 - **Analytics** — nothing's wired up. Cloudflare has a free, privacy-friendly Web Analytics
   option (no cookie banner needed) that's a one-line script tag if you want visit data.
