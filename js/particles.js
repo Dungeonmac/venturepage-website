@@ -104,10 +104,25 @@
       c.stroke();
     },
     code: function (c, s) {
-      c.font = '700 ' + Math.round(s * 0.5) + 'px Arial, sans-serif';
-      c.textAlign = 'center';
-      c.textBaseline = 'middle';
-      c.fillText('</>', s / 2, s / 2);
+      var cx = s / 2, cy = s / 2, w = s * 0.92, h = s * 0.46, gap = s * 0.09;
+      c.lineWidth = s * 0.075;
+      c.lineCap = 'round';
+      c.lineJoin = 'round';
+      c.beginPath();
+      c.moveTo(cx - gap, cy - h / 2);
+      c.lineTo(cx - w / 2, cy);
+      c.lineTo(cx - gap, cy + h / 2);
+      c.stroke();
+      c.beginPath();
+      c.moveTo(cx + gap, cy - h / 2);
+      c.lineTo(cx + w / 2, cy);
+      c.lineTo(cx + gap, cy + h / 2);
+      c.stroke();
+      c.lineWidth = s * 0.06;
+      c.beginPath();
+      c.moveTo(cx - gap * 0.45, cy + h * 0.55);
+      c.lineTo(cx + gap * 0.45, cy - h * 0.55);
+      c.stroke();
     },
     clock: function (c, s) {
       var cx = s / 2, cy = s / 2, r = s * 0.36;
